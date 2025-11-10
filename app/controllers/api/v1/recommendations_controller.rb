@@ -6,15 +6,21 @@ module Api
       def index
         @recommendations = Recommendation.includes(:user, :book, :votes).order(created_at: :desc)
         render json: @recommendations.as_json(
-          include: [:user, :book],
+          except: [:user_id, :book_id],
+          include: {
+            user: { only: [:id, :username] },
+            book: { 
+              except: [:created_at, :updated_at] 
+            }
+          },
           methods: [:vote_count]
         )
       end
 
       def show
-        @recommendation = Recommendation.includes(:user, :book, :votes, comments: :user).find(params[:id])
+        @recommendation = Recommendation.includes(:user, :book, :votes).find(params[:id])
         render json: @recommendation.as_json(
-          include: [:user, :book, { comments: { include: :user } }],
+          include: [:user, :book],
           methods: [:vote_count]
         )
       end
@@ -67,13 +73,15 @@ module Api
                                         .order('created_at DESC')
                                         .limit(10)
         
-        # Sort by trending score
         sorted_recommendations = @recommendations.sort_by { |r| -r.trending_score }
-        
-        render json: sorted_recommendations.as_json(
-          include: [:user, :book],
-          methods: [:vote_count]
-        )
+        render json: sorted_recommendations.map { |r| {
+            review: r.review,
+            vote_count: r.vote_count,
+            user: {
+                id: r.user.id,
+                username: r.user.username
+            }
+        }.merge(r.book.as_json) }
       end
 
       private
