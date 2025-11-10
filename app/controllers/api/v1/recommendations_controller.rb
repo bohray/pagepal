@@ -6,24 +6,40 @@ module Api
       def index
         @recommendations = Recommendation.includes(:user, :book, :votes).order(created_at: :desc)
         render json: @recommendations.as_json(
-          include: [:user, :book],
+          except: [:user_id, :book_id],
+          include: {
+            user: { only: [:id, :username] },
+            book: { 
+              except: [:created_at, :updated_at] 
+            }
+          },
           methods: [:vote_count]
         )
       end
 
       def show
-        @recommendation = Recommendation.includes(:user, :book, :votes, comments: :user).find(params[:id])
+        @recommendation = Recommendation.includes(:user, :book, :votes).find(params[:id])
         render json: @recommendation.as_json(
-          include: [:user, :book, { comments: { include: :user } }],
+          include: [:user, :book],
           methods: [:vote_count]
         )
       end
 
       def create
-        @book = Book.find_or_create_by(book_params)
+        rec_params = params.require(:recommendation).permit(:title, :author, :description, :review, :image_url, :genre)
+
+        @book = Book.find_or_initialize_by(title: rec_params[:title], author: rec_params[:author])
+        @book.description = rec_params[:description]
+        @book.image_url = rec_params[:image_url]
+        @book.genre = rec_params[:genre]
+
+        unless @book.save
+          return render json: { errors: @book.errors.full_messages }, status: :unprocessable_entity
+        end
+
         @recommendation = current_user.recommendations.build(
           book: @book,
-          review: params[:recommendation][:review]
+          review: rec_params[:review]
         )
 
         if @recommendation.save
@@ -67,19 +83,21 @@ module Api
                                         .order('created_at DESC')
                                         .limit(10)
         
-        # Sort by trending score
         sorted_recommendations = @recommendations.sort_by { |r| -r.trending_score }
-        
-        render json: sorted_recommendations.as_json(
-          include: [:user, :book],
-          methods: [:vote_count]
-        )
+        render json: sorted_recommendations.map { |r| {
+            review: r.review,
+            vote_count: r.vote_count,
+            user: {
+                id: r.user.id,
+                username: r.user.username
+            }
+        }.merge(r.book.as_json) }
       end
 
       private
 
       def book_params
-        params.require(:recommendation).permit(:title, :author, :image_url, :description, :isbn)
+        params.require(:recommendation).permit(:title, :author, :description)
       end
     end
   end

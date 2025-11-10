@@ -1,11 +1,11 @@
 module Api
   module V1
     class UsersController < ApiController
-      skip_before_action :authenticate_user!, only: [:show]
+      skip_before_action :authenticate_user!, only: [:show, :current]
 
       def current
         if current_user
-          render json: current_user.as_json(only: [:id, :email, :username])
+          render json: { user: current_user.as_json(only: [:id, :email, :username]) }
         else
           render json: { user: nil }
         end

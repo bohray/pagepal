@@ -2,7 +2,6 @@ class Recommendation < ApplicationRecord
   belongs_to :user
   belongs_to :book
   has_many :votes, dependent: :destroy
-  has_many :comments, dependent: :destroy
 
   validates :review, presence: true, length: { maximum: 250 }
 
@@ -13,6 +12,11 @@ class Recommendation < ApplicationRecord
   def voted_by?(user)
     return false unless user
     votes.exists?(user_id: user.id)
+  end
+
+  def voter_ids(exclude_user = nil)
+    ids = votes.pluck(:user_id)
+    exclude_user ? ids - [exclude_user.id] : ids
   end
 
   def trending_score
