@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import BookCard from "./BookCard";
 import { Link } from "react-router-dom";
+import { getMaxVote, getMostRecentDate } from "../../utils/sortValue";
+import { urls } from "../../constants/urls";
 
 function BookFeed({
   data,
@@ -23,9 +25,9 @@ function BookFeed({
       return matchesSearch && matchesGenre;
     })
     .sort((a, b) => {
-      if (sortBy === "votes") return b.vote_count - a.vote_count;
+      if (sortBy === "votes") return getMaxVote(b) - getMaxVote(a);
       if (sortBy === "recent")
-        return new Date(b.created_at) - new Date(a.created_at);
+        return getMostRecentDate(b) - getMostRecentDate(a);
       return 0;
     });
 
@@ -82,7 +84,7 @@ function BookFeed({
 
       {linkRequired && (
         <div className="text-center mt-8">
-          <Link to="/books" className="text-blue-600 hover:underline">
+          <Link to={urls.books} className="text-blue-600 hover:underline">
             View All Books →
           </Link>
         </div>

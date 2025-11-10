@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { usersAPI } from "../../services/api";
+import { recommendationsAPI, usersAPI } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -23,6 +23,23 @@ const Profile = () => {
     };
     getData();
   }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await recommendationsAPI.delete(id);
+      toast.success("Recommendation deleted successfully!");
+
+      // Update UI after deletion
+      setData((prev) => ({
+        ...prev,
+        recommendations: prev.recommendations.filter((rec) => rec.id !== id),
+      }));
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.message || "Failed to delete recommendation");
+    }
+  };
+
   return (
     // <div>Working</div>
     <div className="max-w-2xl mx-auto">
@@ -62,15 +79,25 @@ const Profile = () => {
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <h4 className="text-xl font-bold ">{rec.book?.title}</h4>
-                  <p className="">{rec.book?.author}</p>
+                  <h4 className="text-xl font-bold">{rec.book?.title}</h4>
+                  <p>{rec.book?.author}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm ">Votes</div>
+                  <div className="text-sm">Votes</div>
                   <div className="text-2xl font-bold text-primary">
                     {rec.vote_count}
                   </div>
                 </div>
+              </div>
+
+              {/* 🗑️ Delete button */}
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => handleDelete(rec.id)}
+                  className="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-400 transition-colors cursor-pointer"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))

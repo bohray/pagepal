@@ -22,13 +22,9 @@ if (token) {
 
 export const booksAPI = {
   getAll: () => api.get("/books"),
-  getOne: (id) => api.get(`/books/${id}`),
-  create: (bookData) => api.post("/books", { book: bookData }),
 };
 
 export const recommendationsAPI = {
-  getAll: () => api.get("/recommendations"),
-  getOne: (id) => api.get(`/recommendations/${id}`),
   create: (data) => api.post("/recommendations", { recommendation: data }),
   delete: (id) => api.delete(`/recommendations/${id}`),
   vote: (id) => api.post(`/recommendations/${id}/vote`),

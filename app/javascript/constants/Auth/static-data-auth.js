@@ -41,3 +41,22 @@ export const getformFields = (mode) => {
     },
   ];
 };
+
+export const toastMsg = (loginMode) => {
+  return loginMode
+    ? "Logged in successfully!"
+    : "Account created successfully!";
+};
+
+export const modeInfo = {
+  login: {
+    button: "Login",
+    toggleText: "Don't have an account?",
+    toggleAction: "Sign up",
+  },
+  signup: {
+    button: "Create Account",
+    toggleText: "Already have an account?",
+    toggleAction: "Login",
+  },
+};

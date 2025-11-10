@@ -9,20 +9,15 @@ import { AuthProvider, useAuth } from "../contexts/AuthContext";
 import Navbar from "./common/Navbar";
 import Home from "./Home";
 import BookList from "./books/BookList";
-import BookDetail from "./books/BookDetail";
 import Profile from "./profile/Profile";
 import { AuthPage } from "./auth/AuthPage";
 import { Toaster } from "sonner";
-// import TrendingPage from "./recommendations/TrendingPage";
+import Loader from "./common/Loader";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
-    );
+    return <Loader />;
   }
 
   return isAuthenticated ? children : <Navigate to="/auth" />;
@@ -38,7 +33,6 @@ function AppRoutes() {
             <Route path="/" element={<Home />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/books" element={<BookList />} />
-            <Route path="/book/:id" element={<BookDetail />} />
             <Route
               path="/profile"
               element={

@@ -3,12 +3,16 @@ import {
   authButtons,
   getformFields,
   inititalAuthData,
+  modeInfo,
+  toastMsg,
 } from "../../constants/Auth/static-data-auth";
 import { toast } from "sonner";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { urls } from "../../constants/urls";
+import Loader from "../common/Loader";
 
-export function AuthPage({ onAuthSuccess }) {
+export function AuthPage() {
   const { login, signup } = useAuth();
   const [mode, setMode] = useState(authButtons[0].id);
   const [formData, setFormData] = useState(inititalAuthData);
@@ -36,13 +40,8 @@ export function AuthPage({ onAuthSuccess }) {
     e.preventDefault();
 
     const { name, email, password } = formData;
-    if (!email || !password) {
+    if (!email || !password || (!loginMode && !name)) {
       toast.error("Missing Credentials");
-      return;
-    }
-
-    if (!loginMode && !name) {
-      toast.error("Name is required");
       return;
     }
 
@@ -51,12 +50,9 @@ export function AuthPage({ onAuthSuccess }) {
     try {
       const action = loginMode ? login : signup;
       const args = loginMode ? [email, password] : [name, email, password];
-      const toastMsg = loginMode
-        ? "Logged in successfully!"
-        : "Account created successfully!";
 
       await action(...args);
-      toast.success(toastMsg);
+      toast.success(toastMsg(loginMode));
       navigate(urls.home);
     } catch (err) {
       toast.error(
@@ -67,6 +63,8 @@ export function AuthPage({ onAuthSuccess }) {
       setLoading(false);
     }
   };
+
+  if (loading) return <Loader />;
 
   return (
     <div className="h-[80vh] bg-background flex items-center justify-center px-4">
@@ -111,17 +109,17 @@ export function AuthPage({ onAuthSuccess }) {
               className="w-full px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 font-medium mt-6 transition-all duration-150 
            transform active:scale-95"
             >
-              {loginMode ? "Login" : "Create Account"}
+              {modeInfo[mode].button}
             </button>
           </form>
 
           <p className="text-center text-muted-foreground text-sm mt-6">
-            {loginMode ? "Already have an account?" : "Don't have an account?"}
+            {modeInfo[mode].toggleText}
             <button
               className="text-primary hover:underline ml-1 font-medium"
               onClick={handleMode}
             >
-              {loginMode ? "Login" : "Sign up"}
+              {modeInfo[mode].toggleAction}
             </button>
           </p>
         </div>

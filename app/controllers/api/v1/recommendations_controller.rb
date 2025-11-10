@@ -26,10 +26,20 @@ module Api
       end
 
       def create
-        @book = Book.find_or_create_by(book_params)
+        rec_params = params.require(:recommendation).permit(:title, :author, :description, :review, :image_url, :genre)
+
+        @book = Book.find_or_initialize_by(title: rec_params[:title], author: rec_params[:author])
+        @book.description = rec_params[:description]
+        @book.image_url = rec_params[:image_url]
+        @book.genre = rec_params[:genre]
+
+        unless @book.save
+          return render json: { errors: @book.errors.full_messages }, status: :unprocessable_entity
+        end
+
         @recommendation = current_user.recommendations.build(
           book: @book,
-          review: params[:recommendation][:review]
+          review: rec_params[:review]
         )
 
         if @recommendation.save
@@ -87,7 +97,7 @@ module Api
       private
 
       def book_params
-        params.require(:recommendation).permit(:title, :author, :image_url, :description, :isbn)
+        params.require(:recommendation).permit(:title, :author, :description)
       end
     end
   end

@@ -3,7 +3,6 @@ import { formatDate } from "../../utils/formatDate";
 import { recommendationsAPI } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
 
 /**
  * RecommendationCard - renders one recommendation (or a single book shaped as a recommendation)
@@ -51,50 +50,53 @@ const RecommendationCard = ({
       }
     } catch (error) {
       console.error("Error updating vote: ", error);
-      toast.error("Could not update vote. Try again.");
+      toast.error(
+        error?.response?.data.errors[0] || error?.message || "Can't update vote"
+      );
     }
   };
 
   return (
-    <Link key={id} to={`/book/${id}`}>
-      <div className="rounded-lg border border-gray-300 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
-        <div className="relative h-52 bg-primary/40 overflow-hidden">
-          <img
-            src={image_url || "/placeholder.svg"}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="p-4 flex-1 flex flex-col">
-          <h3 className="font-bold text-lg line-clamp-1">{title}</h3>
-          <p className="text-sm text-slate-500 mb-1">{author}</p>
-          {genre && (
-            <p className="text-xs text-slate-600 mb-3 font-medium">{genre}</p>
-          )}
-          <p className="text-sm line-clamp-3 mb-4 flex-1">{review}</p>
-          <div className="flex items-center justify-between pt-4 border-t border-border">
-            <div className="flex flex-col">
-              <span className="text-xs text-slate-500">
-                {user?.username || "Unknown"}
-              </span>
-              <span className="text-xs text-slate-500">
-                {formatDate(created_at)}
-              </span>
-            </div>
-            <button
-              onClick={handleVoteToggle}
-              className={`px-4 py-2 rounded-lg font-medium cursor-pointer text-sm transition-all duration-200 active:scale-90 ${
-                hasVoted
-                  ? "bg-primary text-white"
-                  : "bg-blue-100 hover:bg-primary hover:text-white"
-              }`}
-            >
-              Votes : {votes}
-            </button>
+    <div
+      key={id}
+      className="rounded-lg border border-gray-300 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col"
+    >
+      <div className="relative h-52 bg-primary/40 overflow-hidden">
+        <img
+          src={image_url || "/placeholder.svg"}
+          alt={title}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div className="p-4 flex-1 flex flex-col">
+        <h3 className="font-bold text-lg line-clamp-1">{title}</h3>
+        <p className="text-sm text-slate-500 mb-1">{author}</p>
+        {genre && (
+          <p className="text-xs text-slate-600 mb-3 font-medium">{genre}</p>
+        )}
+        <p className="text-sm line-clamp-3 mb-4 flex-1">{review}</p>
+        <div className="flex items-center justify-between pt-4 border-t border-border">
+          <div className="flex flex-col">
+            <span className="text-xs text-slate-500">
+              {user?.username || "Unknown"}
+            </span>
+            <span className="text-xs text-slate-500">
+              {formatDate(created_at)}
+            </span>
           </div>
+          <button
+            onClick={handleVoteToggle}
+            className={`px-4 py-2 rounded-lg font-medium cursor-pointer text-sm transition-all duration-200 active:scale-90 ${
+              hasVoted
+                ? "bg-primary text-white"
+                : "bg-blue-100 hover:bg-primary hover:text-white"
+            }`}
+          >
+            Votes : {votes}
+          </button>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

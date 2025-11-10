@@ -18,7 +18,7 @@ function Navbar() {
     <nav className="bg-primary text-white shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
-          <Link to="/" className="text-2xl font-bold">
+          <Link to={urls.home} className="text-2xl font-bold">
             📚 PagePal
           </Link>
 
@@ -26,18 +26,12 @@ function Navbar() {
             <Link to={urls.home} className="hover:text-blue-200">
               Home
             </Link>
-            <Link to="/books" className="hover:text-blue-200">
+            <Link to={urls.books} className="hover:text-blue-200">
               Books
             </Link>
-            {/* <Link to="/trending" className="hover:text-blue-200">
-              Trending
-            </Link> */}
 
             {isAuthenticated ? (
               <>
-                {/* <Link to="/recommend" className="hover:text-blue-200">
-                  Recommend
-                </Link> */}
                 <Link to={urls.profile} className="hover:text-blue-200">
                   Profile
                 </Link>

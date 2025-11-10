@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { booksAPI, recommendationsAPI } from "../../services/api";
+import { booksAPI } from "../../services/api";
 import { toast } from "sonner";
 import BookFeed from "./BookFeed";
 
@@ -17,18 +17,7 @@ const BookList = () => {
         toast.error(error?.message || "Failed Fetching Books!!");
       }
     };
-
-    const getAllRecommendations = async () => {
-      try {
-        const response = await recommendationsAPI.getAll();
-        console.log("recommendations API:", response);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
     getAllBooks();
-    getAllRecommendations();
   }, []);
   return <BookFeed data={data} title="Book List" />;
 };
