@@ -31,4 +31,4 @@ queue:
 
 cache:
   <<: *default
-  url: <%= ENV['CACHE_DATABASE_URL'] || ENV['DATABASE_URL'] %>
+  url: <%=  ENV['DATABASE_URL'] %>
